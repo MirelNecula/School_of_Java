@@ -32,7 +32,6 @@ public class Book {
     private LocalDateTime createdAt;
 
     public Book() {
-
     }
 
     public Long getId() {
