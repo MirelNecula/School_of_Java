@@ -77,7 +77,7 @@ public class JournalCollaboratorService {
         var response = new CollaboratorResponse();
         response.setJournalId(journalId);
         response.setUserId(saved.getUser().getId());
-        response.setRole(request.getRole()); // sau mapezi din saved -> generated
+        response.setRole(request.getRole());
         response.setCreatedAt(saved.getCreatedDate());
         response.setUpdatedAt(saved.getUpdatedDate());
 
