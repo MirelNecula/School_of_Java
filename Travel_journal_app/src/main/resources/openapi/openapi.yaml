@@ -1,0 +1,1567 @@
+openapi: 3.0.3
+info:
+  title: Travel Journal API
+  version: 0.0.1
+servers:
+  - url: http://localhost:8080
+
+tags:
+  - name: Auth
+  - name: Users
+  - name: Journals
+  - name: JournalEntries
+  - name: Locations
+  - name: Tags
+  - name: Collaboration
+  - name: Search
+  - name: Notifications
+
+paths:
+  # =========================
+  # AUTH
+  # =========================
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new user
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "400":
+          description: Validation error
+        "409":
+          description: Username or email already exists
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login with email and password
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "400":
+          description: Validation error
+        "401":
+          description: Invalid credentials
+
+  # =========================
+  # USERS
+  # =========================
+  /users:
+    get:
+      tags: [Users]
+      summary: Get all users
+      operationId: getAllUsers
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserResponse"
+
+  /users/{userId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+
+    get:
+      tags: [Users]
+      summary: Get user by id
+      operationId: getUserById
+      responses:
+        "200":
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "404":
+          description: User not found
+
+    put:
+      tags: [Users]
+      summary: Replace user (PUT)
+      operationId: replaceUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserPutRequest"
+      responses:
+        "200":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "404":
+          description: User not found
+        "409":
+          description: Duplicate username or email
+
+    patch:
+      tags: [Users]
+      summary: Update user (PATCH)
+      operationId: patchUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserPatchRequest"
+      responses:
+        "200":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "404":
+          description: User not found
+        "409":
+          description: Duplicate username or email
+
+    delete:
+      tags: [Users]
+      summary: Delete user
+      operationId: deleteUser
+      responses:
+        "204":
+          description: User deleted
+        "404":
+          description: User not found
+
+  /users/by-email:
+    get:
+      tags: [Users]
+      summary: Get user by email
+      operationId: getUserByEmail
+      parameters:
+        - name: email
+          in: query
+          required: true
+          schema:
+            type: string
+            format: email
+      responses:
+        "200":
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "404":
+          description: User not found
+
+  # =========================
+  # JOURNALS
+  # =========================
+  /journals:
+    post:
+      tags: [Journals]
+      summary: Create a new journal
+      operationId: createJournal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JournalCreateRequest"
+      responses:
+        "201":
+          description: Journal created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JournalResponse"
+        "400":
+          description: Validation error
+
+    get:
+      tags: [Journals]
+      summary: Get all journals
+      operationId: getAllJournals
+      responses:
+        "200":
+          description: List of journals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/JournalResponse"
+
+  /journals/{journalId}:
+    parameters:
+      - name: journalId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+
+    get:
+      tags: [Journals]
+      summary: Get journal by id
+      operationId: getJournalById
+      responses:
+        "200":
+          description: Journal found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JournalResponse"
+        "404":
+          description: Journal not found
+
+    put:
+      tags: [Journals]
+      summary: Replace journal (PUT)
+      operationId: replaceJournal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JournalPutRequest"
+      responses:
+        "200":
+          description: Journal updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JournalResponse"
+        "404":
+          description: Journal not found
+
+    patch:
+      tags: [Journals]
+      summary: Update journal (PATCH)
+      operationId: patchJournal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JournalPatchRequest"
+      responses:
+        "200":
+          description: Journal updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JournalResponse"
+        "404":
+          description: Journal not found
+
+    delete:
+      tags: [Journals]
+      summary: Delete journal
+      operationId: deleteJournal
+      responses:
+        "204":
+          description: Journal deleted
+        "404":
+          description: Journal not found
+
+  # =========================
+  # COLLABORATION
+  # =========================
+  /journals/{journalId}/collaborators:
+    parameters:
+      - name: journalId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+
+    post:
+      tags: [Collaboration]
+      summary: Add a collaborator to a journal
+      operationId: addCollaboratorToJournal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CollaboratorAddRequest"
+      responses:
+        "201":
+          description: Collaborator added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollaboratorResponse"
+        "400":
+          description: Validation error
+        "404":
+          description: Journal or user not found
+        "409":
+          description: Collaborator already exists
+
+    get:
+      tags: [Collaboration]
+      summary: Get collaborators of a journal
+      operationId: getJournalCollaborators
+      responses:
+        "200":
+          description: List of collaborators
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CollaboratorResponse"
+        "404":
+          description: Journal not found
+
+  /journals/{journalId}/collaborators/{collaboratorUserId}:
+    parameters:
+      - name: journalId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: collaboratorUserId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+
+    put:
+      tags: [Collaboration]
+      summary: Replace collaborator data (PUT)
+      operationId: replaceJournalCollaborator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CollaboratorPutRequest"
+      responses:
+        "200":
+          description: Collaborator updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollaboratorResponse"
+        "400":
+          description: Validation error
+        "404":
+          description: Journal or collaborator not found
+
+    patch:
+      tags: [Collaboration]
+      summary: Update collaborator data (PATCH)
+      operationId: patchJournalCollaborator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CollaboratorPatchRequest"
+      responses:
+        "200":
+          description: Collaborator updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollaboratorResponse"
+        "400":
+          description: Validation error
+        "404":
+          description: Journal or collaborator not found
+
+    delete:
+      tags: [Collaboration]
+      summary: Delete collaborator from journal
+      operationId: deleteJournalCollaborator
+      responses:
+        "204":
+          description: Collaborator removed
+        "404":
+          description: Journal or collaborator not found
+
+  # =========================
+  # SEARCH
+  # =========================
+  /journals/search:
+    get:
+      tags: [Search]
+      summary: Search journals by tag, country, entry title substring, and visibility
+      operationId: searchJournals
+      parameters:
+        - name: tagId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: country
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+          description: Match journals that have at least one entry location with this country
+        - name: entryTitle
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 200
+          description: Substring match on entry title (case-insensitive)
+        - name: visibility
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Visibility"
+          description: Filter by journal visibility (PRIVATE/FRIENDS/PUBLIC)
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/JournalResponse"
+        "400":
+          description: Validation error
+
+  # =========================
+  # JOURNAL ENTRIES (separate API)
+  # =========================
+  /journals/{journalId}/entries:
+    parameters:
+      - name: journalId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+
+    post:
+      tags: [JournalEntries]
+      summary: Add journal entry for a journal
+      operationId: createJournalEntry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JournalEntryCreateRequest"
+      responses:
+        "201":
+          description: Entry created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JournalEntryResponse"
+        "400":
+          description: Validation error
+        "404":
+          description: Journal not found
+
+    get:
+      tags: [JournalEntries]
+      summary: Get all entries for a journal
+      operationId: getAllJournalEntries
+      responses:
+        "200":
+          description: List of entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/JournalEntryResponse"
+        "404":
+          description: Journal not found
+
+  /journals/{journalId}/entries/{entryId}:
+    parameters:
+      - name: journalId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: entryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+
+    get:
+      tags: [JournalEntries]
+      summary: Get one entry by id for a journal
+      operationId: getJournalEntryById
+      responses:
+        "200":
+          description: Entry found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JournalEntryResponse"
+        "404":
+          description: Journal or entry not found
+
+    put:
+      tags: [JournalEntries]
+      summary: Replace journal entry (PUT)
+      operationId: replaceJournalEntry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JournalEntryPutRequest"
+      responses:
+        "200":
+          description: Entry updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JournalEntryResponse"
+        "400":
+          description: Validation error
+        "404":
+          description: Journal or entry not found
+
+    patch:
+      tags: [JournalEntries]
+      summary: Update journal entry fields (PATCH)
+      operationId: patchJournalEntry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JournalEntryPatchRequest"
+      responses:
+        "200":
+          description: Entry updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JournalEntryResponse"
+        "400":
+          description: Validation error
+        "404":
+          description: Journal or entry not found
+
+    delete:
+      tags: [JournalEntries]
+      summary: Delete entry from journal
+      operationId: deleteJournalEntry
+      responses:
+        "204":
+          description: Entry deleted
+        "404":
+          description: Journal or entry not found
+
+  # =========================
+  # LOCATION attached to ENTRY (separate API)
+  # =========================
+  /journals/{journalId}/entries/{entryId}/location:
+    parameters:
+      - name: journalId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: entryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+
+    post:
+      tags: [Locations]
+      summary: Add (create + attach) location for an entry
+      operationId: createEntryLocation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LocationCreateRequest"
+      responses:
+        "201":
+          description: Location created and attached
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LocationResponse"
+        "400":
+          description: Validation error
+        "404":
+          description: Journal or entry not found
+
+    get:
+      tags: [Locations]
+      summary: Get location for an entry
+      operationId: getEntryLocation
+      responses:
+        "200":
+          description: Location found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LocationResponse"
+        "404":
+          description: Location not found for entry
+
+    put:
+      tags: [Locations]
+      summary: Replace location for an entry (PUT)
+      operationId: replaceEntryLocation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LocationPutRequest"
+      responses:
+        "200":
+          description: Location replaced
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LocationResponse"
+        "400":
+          description: Validation error
+        "404":
+          description: Not found
+
+    patch:
+      tags: [Locations]
+      summary: Patch location for an entry (PATCH)
+      operationId: patchEntryLocation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LocationPatchRequest"
+      responses:
+        "200":
+          description: Location updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LocationResponse"
+        "400":
+          description: Validation error
+        "404":
+          description: Not found
+
+    delete:
+      tags: [Locations]
+      summary: Delete (detach) location from an entry
+      operationId: deleteEntryLocation
+      responses:
+        "204":
+          description: Location deleted/detached
+        "404":
+          description: Not found
+
+  # =========================
+  # TAGS (CRUD) (separate API)
+  # =========================
+  /tags:
+    post:
+      tags: [Tags]
+      summary: Create a tag
+      operationId: createTag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TagCreateRequest"
+      responses:
+        "201":
+          description: Tag created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagResponse"
+        "400":
+          description: Validation error
+        "409":
+          description: Tag already exists
+
+    get:
+      tags: [Tags]
+      summary: Get all tags
+      operationId: getAllTags
+      responses:
+        "200":
+          description: List of tags
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TagResponse"
+
+  /tags/{tagId}:
+    parameters:
+      - name: tagId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+
+    get:
+      tags: [Tags]
+      summary: Get tag by id
+      operationId: getTagById
+      responses:
+        "200":
+          description: Tag found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagResponse"
+        "404":
+          description: Tag not found
+
+    put:
+      tags: [Tags]
+      summary: Replace tag (PUT)
+      operationId: replaceTag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TagPutRequest"
+      responses:
+        "200":
+          description: Tag updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagResponse"
+        "400":
+          description: Validation error
+        "404":
+          description: Tag not found
+        "409":
+          description: Tag name conflict
+
+    patch:
+      tags: [Tags]
+      summary: Patch tag (PATCH)
+      operationId: patchTag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TagPatchRequest"
+      responses:
+        "200":
+          description: Tag updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagResponse"
+        "400":
+          description: Validation error
+        "404":
+          description: Tag not found
+        "409":
+          description: Tag name conflict
+
+    delete:
+      tags: [Tags]
+      summary: Delete tag
+      operationId: deleteTag
+      responses:
+        "204":
+          description: Tag deleted
+        "404":
+          description: Tag not found
+
+  # =========================
+  # TAGS for ENTRY (GET list)  <-- ADĂUGAT
+  # =========================
+  /journals/{journalId}/entries/{entryId}/tags:
+    parameters:
+      - name: journalId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: entryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+
+    get:
+      tags: [Tags]
+      summary: Get tags for a journal entry
+      operationId: getTagsForEntry
+      responses:
+        "200":
+          description: List of tags for entry
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TagResponse"
+        "404":
+          description: Journal or entry not found
+
+  # =========================
+  # TAG attach/detach to ENTRY
+  # =========================
+  /journals/{journalId}/entries/{entryId}/tags/{tagId}:
+    parameters:
+      - name: journalId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: entryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: tagId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+
+    post:
+      tags: [Tags]
+      summary: Add tag to entry
+      operationId: addTagToEntry
+      responses:
+        "204":
+          description: Tag added
+        "404":
+          description: Journal/entry/tag not found
+
+    delete:
+      tags: [Tags]
+      summary: Remove tag from entry
+      operationId: removeTagFromEntry
+      responses:
+        "204":
+          description: Tag removed
+        "404":
+          description: Journal/entry/tag not found
+
+  # =========================
+  # NOTIFICATIONS (optional REST contract)
+  # =========================
+  /notifications:
+    get:
+      tags: [Notifications]
+      summary: Get notifications for current user
+      operationId: getMyNotifications
+      parameters:
+        - name: unreadOnly
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: List of notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NotificationResponse"
+
+  /notifications/{notificationId}:
+    parameters:
+      - name: notificationId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+
+    patch:
+      tags: [Notifications]
+      summary: Mark notification as read/unread
+      operationId: patchNotification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationPatchRequest"
+      responses:
+        "200":
+          description: Notification updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationResponse"
+        "404":
+          description: Notification not found
+
+  /journals/{journalId}/trip-reminders:
+    parameters:
+      - name: journalId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+
+    post:
+      tags: [Notifications]
+      summary: Create a trip reminder for a journal (will later notify user via Kafka/email/etc.)
+      operationId: createTripReminder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TripReminderCreateRequest"
+      responses:
+        "201":
+          description: Trip reminder created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TripReminderResponse"
+        "400":
+          description: Validation error
+        "404":
+          description: Journal not found
+
+    get:
+      tags: [Notifications]
+      summary: Get trip reminders for a journal
+      operationId: getTripRemindersForJournal
+      responses:
+        "200":
+          description: List of trip reminders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TripReminderResponse"
+        "404":
+          description: Journal not found
+
+components:
+  schemas:
+    # =========================
+    # SHARED
+    # =========================
+    Visibility:
+      type: string
+      enum: [PRIVATE, FRIENDS, PUBLIC]
+
+    # =========================
+    # AUTH
+    # =========================
+    RegisterRequest:
+      type: object
+      required: [username, email, password]
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 50
+        email:
+          type: string
+          format: email
+          maxLength: 100
+        password:
+          type: string
+          minLength: 8
+          maxLength: 72
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 100
+        password:
+          type: string
+          minLength: 8
+          maxLength: 72
+
+    LoginResponse:
+      type: object
+      required: [ user, accessToken ]
+      properties:
+        user:
+          $ref: "#/components/schemas/UserResponse"
+        accessToken:
+          type: string
+          description: JWT access token
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        message:
+          type: string
+          example: Login successful
+
+    # =========================
+    # USERS
+    # =========================
+    UserResponse:
+      type: object
+      required: [id, username, email, role, enabled, createdAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          example: USER
+        enabled:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    UserPutRequest:
+      type: object
+      required: [username, email, enabled]
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 50
+        email:
+          type: string
+          format: email
+          maxLength: 100
+        enabled:
+          type: boolean
+        role:
+          type: string
+          example: USER
+
+    UserPatchRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 50
+        email:
+          type: string
+          format: email
+          maxLength: 100
+        enabled:
+          type: boolean
+        role:
+          type: string
+
+    # =========================
+    # JOURNALS
+    # =========================
+    JournalCreateRequest:
+      type: object
+      required: [title, startDate, visibility]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 120
+        description:
+          type: string
+          maxLength: 2000
+          nullable: true
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+          nullable: true
+        visibility:
+          $ref: "#/components/schemas/Visibility"
+
+    JournalPutRequest:
+      type: object
+      required: [title, startDate, visibility]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 120
+        description:
+          type: string
+          maxLength: 2000
+          nullable: true
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+          nullable: true
+        visibility:
+          $ref: "#/components/schemas/Visibility"
+
+    JournalPatchRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 120
+        description:
+          type: string
+          maxLength: 2000
+          nullable: true
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+          nullable: true
+        visibility:
+          $ref: "#/components/schemas/Visibility"
+
+    JournalResponse:
+      type: object
+      required: [id, title, startDate, visibility, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+          nullable: true
+        visibility:
+          $ref: "#/components/schemas/Visibility"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    # =========================
+    # JOURNAL ENTRIES
+    # =========================
+    JournalEntryCreateRequest:
+      type: object
+      required: [entryDate, content]
+      properties:
+        entryDate:
+          type: string
+          format: date
+        title:
+          type: string
+          maxLength: 200
+          nullable: true
+        content:
+          type: string
+          minLength: 1
+        mood:
+          type: string
+          maxLength: 50
+          nullable: true
+        weather:
+          type: string
+          maxLength: 50
+          nullable: true
+
+    JournalEntryPutRequest:
+      type: object
+      required: [entryDate, content]
+      properties:
+        entryDate:
+          type: string
+          format: date
+        title:
+          type: string
+          maxLength: 200
+          nullable: true
+        content:
+          type: string
+          minLength: 1
+        mood:
+          type: string
+          maxLength: 50
+          nullable: true
+        weather:
+          type: string
+          maxLength: 50
+          nullable: true
+
+    JournalEntryPatchRequest:
+      type: object
+      properties:
+        entryDate:
+          type: string
+          format: date
+        title:
+          type: string
+          maxLength: 200
+          nullable: true
+        content:
+          type: string
+          minLength: 1
+        mood:
+          type: string
+          maxLength: 50
+          nullable: true
+        weather:
+          type: string
+          maxLength: 50
+          nullable: true
+
+    JournalEntryResponse:
+      type: object
+      required: [id, journalId, entryDate, content, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+        journalId:
+          type: integer
+          format: int64
+        locationId:
+          type: integer
+          format: int64
+          nullable: true
+        entryDate:
+          type: string
+          format: date
+        title:
+          type: string
+          nullable: true
+        content:
+          type: string
+        mood:
+          type: string
+          nullable: true
+        weather:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    # =========================
+    # LOCATION
+    # =========================
+    LocationCreateRequest:
+      type: object
+      required: [country, city]
+      properties:
+        country:
+          type: string
+          maxLength: 100
+        city:
+          type: string
+          maxLength: 120
+        latitude:
+          type: number
+          format: double
+          nullable: true
+        longitude:
+          type: number
+          format: double
+          nullable: true
+
+    LocationPutRequest:
+      type: object
+      required: [country, city]
+      properties:
+        country:
+          type: string
+          maxLength: 100
+        city:
+          type: string
+          maxLength: 120
+        latitude:
+          type: number
+          format: double
+          nullable: true
+        longitude:
+          type: number
+          format: double
+          nullable: true
+
+    LocationPatchRequest:
+      type: object
+      properties:
+        country:
+          type: string
+          maxLength: 100
+        city:
+          type: string
+          maxLength: 120
+        latitude:
+          type: number
+          format: double
+          nullable: true
+        longitude:
+          type: number
+          format: double
+          nullable: true
+
+    LocationResponse:
+      type: object
+      required: [id, country, city]
+      properties:
+        id:
+          type: integer
+          format: int64
+        country:
+          type: string
+        city:
+          type: string
+        latitude:
+          type: number
+          format: double
+          nullable: true
+        longitude:
+          type: number
+          format: double
+          nullable: true
+
+    # =========================
+    # TAGS
+    # =========================
+    TagCreateRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+          example: adventure
+
+    TagPutRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+
+    TagPatchRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+
+    TagResponse:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+
+    # =========================
+    # COLLABORATION SCHEMAS
+    # =========================
+    CollaboratorRole:
+      type: string
+      enum: [OWNER, EDITOR, VIEWER]
+
+    CollaboratorAddRequest:
+      type: object
+      required: [userId, role]
+      properties:
+        userId:
+          type: integer
+          format: int64
+          description: The user to add as collaborator
+        role:
+          $ref: "#/components/schemas/CollaboratorRole"
+
+    CollaboratorPutRequest:
+      type: object
+      required: [role]
+      properties:
+        role:
+          $ref: "#/components/schemas/CollaboratorRole"
+
+    CollaboratorPatchRequest:
+      type: object
+      properties:
+        role:
+          $ref: "#/components/schemas/CollaboratorRole"
+
+    CollaboratorResponse:
+      type: object
+      required: [journalId, userId, role, createdAt, updatedAt]
+      properties:
+        journalId:
+          type: integer
+          format: int64
+        userId:
+          type: integer
+          format: int64
+        username:
+          type: string
+          nullable: true
+        email:
+          type: string
+          format: email
+          nullable: true
+        role:
+          $ref: "#/components/schemas/CollaboratorRole"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    # =========================
+    # NOTIFICATIONS SCHEMAS
+    # =========================
+    NotificationType:
+      type: string
+      enum: [TRIP_REMINDER, BUDGET_EXCEEDED, COLLABORATOR_UPDATED]
+
+    NotificationResponse:
+      type: object
+      required: [id, type, message, createdAt, read]
+      properties:
+        id:
+          type: integer
+          format: int64
+        type:
+          $ref: "#/components/schemas/NotificationType"
+        message:
+          type: string
+        journalId:
+          type: integer
+          format: int64
+          nullable: true
+        entryId:
+          type: integer
+          format: int64
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        read:
+          type: boolean
+
+    NotificationPatchRequest:
+      type: object
+      properties:
+        read:
+          type: boolean
+
+    TripReminderCreateRequest:
+      type: object
+      required: [remindAt]
+      properties:
+        remindAt:
+          type: string
+          format: date-time
+          description: When the reminder should trigger
+        note:
+          type: string
+          maxLength: 500
+          nullable: true
+
+    TripReminderResponse:
+      type: object
+      required: [id, journalId, remindAt, createdAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+        journalId:
+          type: integer
+          format: int64
+        remindAt:
+          type: string
+          format: date-time
+        note:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time

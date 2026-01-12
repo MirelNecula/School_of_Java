@@ -1,8 +1,12 @@
 package org.example.traveljournalapi.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class UpdateUserDTO {
 
+    @NotBlank(message = "Name is mandatory")
     private String name;
+    @NotBlank(message = "Surname is mandatory")
     private String surname;
 
     public String getName() {

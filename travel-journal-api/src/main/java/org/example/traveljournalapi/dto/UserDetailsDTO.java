@@ -1,5 +1,8 @@
 package org.example.traveljournalapi.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 public class UserDetailsDTO {
 
     private Long id;

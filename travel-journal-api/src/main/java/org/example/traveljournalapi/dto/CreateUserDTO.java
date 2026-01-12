@@ -1,10 +1,25 @@
 package org.example.traveljournalapi.dto;
 
-public class CreateUserDTO {
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import org.springframework.validation.annotation.Validated;
 
+
+public class CreateUserDTO {
+    @NotBlank(message = "Name is mandatory")
     private String name;
+
+    @Email(message = "Email should be valid")
+    @NotBlank(message = "Email is mandatory")
     private String email;
+
+    @Size(min = 7, message = "Password must be at least 7 characters long")
+    @NotBlank(message = "Password is mandatory")
     private String password;
+
+    @NotBlank(message = "Surname is mandatory")
     private String surname;
 
     public String getName() {
