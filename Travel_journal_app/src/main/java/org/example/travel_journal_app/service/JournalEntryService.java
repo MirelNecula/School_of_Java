@@ -6,6 +6,7 @@ import org.example.travel_journal_app.generated.model.JournalEntryCreateRequest;
 import org.example.travel_journal_app.generated.model.JournalEntryResponse;
 import org.example.travel_journal_app.repository.JournalEntryRepository;
 import org.example.travel_journal_app.repository.JournalRepository;
+import org.example.travel_journal_app.repository.LocationRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,10 +16,14 @@ public class JournalEntryService {
 
     private final JournalEntryRepository journalEntryRepository;
     private final JournalRepository journalRepository;
+    private final LocationRepository locationRepository;
 
-    public JournalEntryService(JournalEntryRepository journalEntryRepository, JournalRepository journalRepository) {
+    public JournalEntryService(JournalEntryRepository journalEntryRepository,
+                               JournalRepository journalRepository,
+                               LocationRepository locationRepository) {
         this.journalEntryRepository = journalEntryRepository;
         this.journalRepository = journalRepository;
+        this.locationRepository = locationRepository;
     }
 
     public JournalEntryResponse createJournalEntry(Long journalId, JournalEntryCreateRequest request) {
@@ -90,6 +95,7 @@ public class JournalEntryService {
         return new JournalEntryResponse()
                 .id(entry.getId())
                 .journalId(entry.getJournal().getId())
+                .locationId(entry.getLocation() != null ? entry.getLocation().getId() : null)
                 .entryDate(entry.getEntryDate())
                 .title(entry.getTitle())
                 .content(entry.getContent())
@@ -98,4 +104,14 @@ public class JournalEntryService {
                 .createdAt(entry.getCreatedAt())
                 .updatedAt(entry.getUpdatedAt());
     }
+
+    public void attachLocationToEntry(Long journalId, Long entryId, Long locationId) {
+        JournalEntry entry = journalEntryRepository.findByIdAndJournal_Id(entryId, journalId)
+                .orElseThrow(() -> new RuntimeException("Journal Entry not found " + entryId + " for Journal " + journalId));
+        var location = locationRepository.findById(locationId)
+                .orElseThrow(() -> new RuntimeException("Location not found " + locationId));
+        entry.setLocation(location);
+        journalEntryRepository.save(entry);
+    }
+
 }

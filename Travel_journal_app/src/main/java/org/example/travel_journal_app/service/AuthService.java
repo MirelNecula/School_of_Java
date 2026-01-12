@@ -7,6 +7,7 @@ import org.example.travel_journal_app.generated.model.LoginResponse;
 import org.example.travel_journal_app.generated.model.RegisterRequest;
 import org.example.travel_journal_app.generated.model.UserResponse;
 import org.example.travel_journal_app.repository.UserRepository;
+import org.example.travel_journal_app.security.JwtService;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,10 +19,14 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public UserResponse registerUser(RegisterRequest request) {
@@ -44,7 +49,6 @@ public class AuthService {
         user.setUpdatedAt(now);
 
         User saved = userRepository.save(user);
-
         return toUserResponse(saved);
     }
 
@@ -57,8 +61,15 @@ public class AuthService {
             throw new BadCredentialsException("Invalid credentials");
         }
 
+        String accessToken = jwtService.createAccessToken(
+                user.getId(),
+                user.getEmail(),
+                user.getRole()
+        );
+
         return new LoginResponse()
                 .user(toUserResponse(user))
+                .accessToken(accessToken)
                 .message("Login Successful");
     }
 

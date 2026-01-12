@@ -8,6 +8,8 @@ import org.example.travel_journal_app.generated.model.JournalEntryResponse;
 import org.example.travel_journal_app.service.JournalEntryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -65,5 +67,17 @@ public class JournalEntitiesController implements JournalEntriesApi {
     public ResponseEntity<Void> deleteJournalEntry(Long journalId, Long entryId) {
         journalEntryService.deleteJournalEntry(journalId, entryId);
         return ResponseEntity.noContent().build();
+
     }
+
+    @PutMapping("/journals/{journalId}/entries/{entryId}/location/{locationId}")
+    public ResponseEntity<Void> attachLocation(
+            @PathVariable Long journalId,
+            @PathVariable Long entryId,
+            @PathVariable Long locationId
+    ) {
+        journalEntryService.attachLocationToEntry(journalId, entryId, locationId);
+        return ResponseEntity.noContent().build();
+    }
+
 }
